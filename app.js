@@ -26,6 +26,18 @@ const MODULES = {
     desc: 'p tubligi, singulyarlik, nuqta egri chiziqdami, P+Q, 2P, k·P, #E va ord(P) — har bir hisob alohida.',
     icon: '<svg viewBox="0 0 48 48"><path d="M8 40C14 30 14 18 24 18s10 12 16 22M24 18c-6 0-8-6-8-10" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="14" cy="31" r="3.5" fill="currentColor"/><circle cx="34" cy="31" r="3.5" fill="currentColor"/><path d="M14 31h20" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/></svg>',
     defaults: { p: 17, a: 2, b: 2, P: '5, 1', Q: '6, 3', k: 9 }
+  },
+  dh: {
+    title: 'DH va ECDH', full: 'Diffie–Hellman va elliptik egri chiziqli Diffie–Hellman kalit almashish protokollari', tag: 'Kalit kelishuvi · RFC 7748 · SP 800-56A',
+    desc: 'Parametrlar tahlili, ochiq kalitlar almashinuvi, umumiy sir, tinglovchi va «o‘rtadagi odam» hujumlari, DH va ECDH taqqoslash.',
+    icon: '<svg viewBox="0 0 48 48"><circle cx="10" cy="24" r="6" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="38" cy="24" r="6" fill="none" stroke="currentColor" stroke-width="3"/><path d="M16 19h16M28 15l4 4-4 4M32 29H16M20 25l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2.6"/><circle cx="24" cy="40" r="3.5" fill="currentColor"/><path d="M24 36v-4" stroke="currentColor" stroke-width="2.4"/></svg>',
+    defaults: { p: 23, g: 5, xa: 6, xb: 15, m: 9, ep: 17, ea: 2, eb: 2, G: '5, 1', da: 3, db: 7 },
+    presets: [
+      ['Klassik misol', { p: 23, g: 5, xa: 6, xb: 15, m: 9, ep: 17, ea: 2, eb: 2, G: '5, 1', da: 3, db: 7 }],
+      ['Xavfsiz tub p = 2027', { p: 2027, g: 2, xa: 777, xb: 1500, m: 404, ep: 97, ea: 3, eb: 2, G: '', da: 11, db: 29 }],
+      ['g generator emas', { p: 23, g: 2, xa: 6, xb: 15, m: 9, ep: 17, ea: 2, eb: 3, G: '16, 0', da: 4, db: 9 }],
+      ['Xato kiritmalar', { p: 21, g: 5, xa: 6, xb: 15, m: 9, ep: 17, ea: 2, eb: 2, G: '5, 2', da: 0, db: 7 }]
+    ]
   }
 };
 
@@ -64,7 +76,7 @@ function field(id, label, val, type = 'number') {
 
 function renderModule(key) {
   const m = MODULES[key], d = m.defaults;
-  const extra = key === 'ecc'
+  const extra = key === 'dh' ? '' : key === 'ecc'
     ? field('P', 'Nuqta P (x, y)', d.P, 'text') + field('Q', 'Nuqta Q (x, y)', d.Q, 'text') + field('k', 'Skalyar k', d.k)
     : key === 'elgamal'
     ? field('nb', 'Maxfiy kalit n<sub>B</sub>', d.nb) + field('k', 'Tasodifiy k (boshlang‘ich)', d.k) + field('msg', 'Ochiq matn (A–Z, 0–9, ␣)', d.msg, 'text')
@@ -77,9 +89,14 @@ function renderModule(key) {
     <div class="modes"><button class="seg on" data-mode="step">Bitta qadam</button><button class="seg" data-mode="all">To‘liq jarayon</button></div>
   </nav>
   <section class="params">
-    <div class="grid">
-      ${field('p', 'Modul p (tub)', d.p)}${field('a', 'a', d.a)}${field('b', 'b', d.b)}
-      ${extra}
+    <div class="grid${key === 'dh' ? ' dhgrid' : ''}">
+      ${key === 'dh' ? `<div class="presets"><span>Misollar:</span>${m.presets.map(([n], i) => `<button class="pre" data-i="${i}">${n}</button>`).join('')}</div>
+      <div class="fgs"><fieldset class="fg"><legend>Diffie–Hellman · Z<sub>p</sub>*</legend><div class="fgg" style="--c:5">
+      ${field('p', 'p (tub)', d.p)}${field('g', 'Generator g', d.g)}${field('xa', 'Alice: a', d.xa)}${field('xb', 'Bob: b', d.xb)}${field('m', 'Mallory: m', d.m)}</div></fieldset>
+      <fieldset class="fg"><legend>ECDH · y² ≡ x³ + ax + b (mod p)</legend><div class="fgg" style="--c:6">
+      ${field('ep', 'p (tub)', d.ep)}${field('ea', 'a', d.ea)}${field('eb', 'b', d.eb)}${field('G', 'G (bo‘sh = avto)', d.G, 'text')}${field('da', 'Alice: d<sub>A</sub>', d.da)}${field('db', 'Bob: d<sub>B</sub>', d.db)}</div></fieldset></div>`
+      : `${field('p', 'Modul p (tub)', d.p)}${field('a', 'a', d.a)}${field('b', 'b', d.b)}
+      ${extra}`}
     </div>
     <button id="run" class="btn">Hisoblash</button>
   </section>
@@ -98,7 +115,7 @@ function renderModule(key) {
   </div>
   </div>`;
   let mode = 'step', steps = [], units = [], uStep = [], stepRange = [], g = 0, playing = false, timer = null, speed = 1;
-  const UNITS = 'div.sub, div.f, div.res, div.warn, tr, details, .chip, .cell, .keys, .sig, .verdict, svg.plot, .ct';
+  const UNITS = 'div.sub, div.f, div.res, div.warn, tr, details, .chip, .cell, .keys, .sig, .verdict, svg.plot, .ct, .xchg';
   const frame = $('#steps');
 
   // g — butun jarayondagi joriy amal raqami; 0..g gacha bo'lganlar ko'rinadi
@@ -159,11 +176,14 @@ function renderModule(key) {
     $('#err').textContent = '';
     try {
       const v = id => $('#f-' + id).value;
-      const p = +v('p'), a = +v('a'), b = +v('b');
-      if ([p, a, b].some(x => !Number.isInteger(x))) throw 'p, a, b butun son bo‘lishi kerak.';
-      if (p > 2000 || p < 2) throw 'p 2 dan 2000 gacha bo‘lishi kerak (o‘quv rejimi, barcha nuqtalar sanaladi).';
-      if (key !== 'ecc' && !isPrime(p)) throw `p = ${p} tub son emas.`;
-      steps = ({ ecdsa: runECDSA, gost: runGOST, elgamal: runElGamal, ecc: runECC })[key](p, a, b, v);
+      if (key === 'dh') steps = runDH(v);
+      else {
+        const p = +v('p'), a = +v('a'), b = +v('b');
+        if ([p, a, b].some(x => !Number.isInteger(x))) throw 'p, a, b butun son bo‘lishi kerak.';
+        if (p > 2000 || p < 2) throw 'p 2 dan 2000 gacha bo‘lishi kerak (o‘quv rejimi, barcha nuqtalar sanaladi).';
+        if (key !== 'ecc' && !isPrime(p)) throw `p = ${p} tub son emas.`;
+        steps = ({ ecdsa: runECDSA, gost: runGOST, elgamal: runElGamal, ecc: runECC })[key](p, a, b, v);
+      }
       if (steps.warn?.length) $('#err').innerHTML = steps.warn.map(w => '⚠ ' + w).join('<br>');
     } catch (e) { $('#err').textContent = '⚠ ' + (e.message || e); steps = []; }
     frame.innerHTML = steps.map((s, i) => `<article class="step" id="s${i}"><div class="shead"><span class="snum">${i + 1}</span><div><div class="sphase">${s.phase}</div><h2>${s.title}</h2></div></div><div class="sbody">${s.html}</div></article>`).join('');
@@ -178,6 +198,13 @@ function renderModule(key) {
     if (units.length) { setPos(stepRange[0][1], false); frame.scrollTop = 0; }
   };
   $('#run').onclick = run;
+  document.querySelectorAll('.pre').forEach(bt => bt.onclick = () => {
+    const o = m.presets[+bt.dataset.i][1];
+    for (const k in o) $('#f-' + k).value = o[k];
+    run();
+    document.querySelectorAll('.pre').forEach(x => x.classList.toggle('on', x === bt));
+  });
+  document.querySelectorAll('.params input').forEach(i => i.addEventListener('input', () => document.querySelectorAll('.pre').forEach(x => x.classList.remove('on'))));
   run();
 }
 
@@ -496,6 +523,264 @@ function runECC(p, a, b, v) {
     <div class="verdict ${warn.length ? 'bad' : 'good'}">${warn.length ? `⚠ ${warn.length} ta ogohlantirish bor — yuqoridagi xabarlarni ko‘ring` : '✔ Barcha tekshiruvlar o‘tdi, hisoblar yakunlandi'}</div>`;
   steps.push({ phase: 'Natija', title: 'Yakuniy natijalar', html: h });
   return steps;
+}
+
+// ---------- DH va ECDH (kalit almashish protokollari) ----------
+const powQ = (g, e, p) => { let r = 1 % p, x = mod(g, p); while (e > 0) { if (e % 2) r = r * x % p; x = x * x % p; e = Math.floor(e / 2); } return r; };
+const fmtFac = f => Object.entries(f.reduce((o, x) => (o[x] = (o[x] || 0) + 1, o), {})).map(([b, e]) => e > 1 ? `${b}<sup>${e}</sup>` : b).join(' · ');
+
+// Modulli darajaga ko'tarish: «kvadratga oshirish va ko'paytirish» — har bir bit jadvalda
+function powHtml(g, e, p, title) {
+  const bits = e.toString(2); let r = 1;
+  let h = `<div class="sub">${title}: ${e} = ${bits}<sub>2</sub> — «kvadratga oshirish va ko‘paytirish» algoritmi (chapdan o‘ngga, R = 1 dan boshlab)</div>
+    <div class="scroll"><table class="mini"><tr><th>bit</th><th>R² mod p</th><th>bit = 1 ⇒ R·${g} mod p</th><th>R</th></tr>`;
+  for (const bit of bits) {
+    const sq = r * r % p; let nr = sq, cell = '—';
+    if (bit === '1') { nr = sq * g % p; cell = `${sq}·${g} = ${sq * g} ≡ ${nr}`; }
+    h += `<tr><td>${bit}</td><td>${r}² = ${r * r} ≡ ${sq}</td><td>${cell}</td><td><b>${nr}</b></td></tr>`;
+    r = nr;
+  }
+  h += `</table></div><div class="res">${g}<sup>${e}</sup> mod ${p} = <b>${r}</b></div>`;
+  return { val: r, html: h };
+}
+
+// Tublikni sinov bo'lish bilan tekshirish (faqat tub bo'luvchilarga)
+function primeHtml(p) {
+  const sq = Math.floor(Math.sqrt(p)); let div = null;
+  let h = `<div class="sub">Sinov bo‘lish: ${p} ni ⌊√${p}⌋ = ${sq} gacha bo‘lgan tub sonlarga bo‘lib ko‘ramiz</div><div class="chips">`;
+  for (let i = 2; i <= sq; i++) { if (!isPrime(i)) continue; const r = p % i; h += `<span class="chip ${r ? '' : 'inf'}">${p} mod ${i} = ${r}</span>`; if (!r) { div = i; break; } }
+  h += `</div>`;
+  return { ok: p > 3 && !div, div, html: h };
+}
+
+const party = (cls, ico, name, body) => `<div class="xp ${cls}"><h4><i>${ico}</i>${name}</h4>${body}</div>`;
+const xchg = (L, mid, R) => `<div class="xchg">${L}<div class="xm">${mid}</div>${R}</div>`;
+
+function readInt(v, id, name) {
+  const s = String(v(id)).trim(), x = Number(s);
+  if (s === '' || !Number.isInteger(x)) throw `${name} butun son bo‘lishi kerak (kiritilgan: “${s}”).`;
+  return x;
+}
+
+function runDH(v) {
+  const steps = [], warn = []; steps.warn = warn;
+  const dh = dhPart(v, steps, warn), ec = ecdhPart(v, steps, warn);
+  // Yakuniy taqqoslash
+  const row = (k, a, b) => `<tr><td>${k}</td><td>${a}</td><td>${b}</td></tr>`;
+  const na = '—';
+  let h = `<table class="mini"><tr><th>Ko‘rsatkich</th><th>DH (Z<sub>p</sub>*)</th><th>ECDH (E(F<sub>p</sub>))</th></tr>
+    ${row('Guruh', dh ? `Z<sub>${dh.p}</sub>*, tartibi p − 1 = ${dh.p - 1}` : na, ec ? `E(F<sub>${ec.p}</sub>), #E = ${ec.N}` : na)}
+    ${row('Generator', dh ? `g = ${dh.g}, ord(g) = ${dh.o}` : na, ec ? `G = ${fmtP(ec.G)}, ord(G) = n = ${ec.n}` : na)}
+    ${row('Asosiy amal', 'modulli darajaga ko‘tarish g<sup>x</sup> mod p', 'skalyar ko‘paytma d·G (qo‘shish + ikkilantirish)')}
+    ${row('Maxfiy kalitlar', dh ? `a = ${dh.a}, b = ${dh.b}` : na, ec ? `d<sub>A</sub> = ${ec.da}, d<sub>B</sub> = ${ec.db}` : na)}
+    ${row('Ochiq kalitlar', dh ? `A = ${dh.A}, B = ${dh.B}` : na, ec ? `Q<sub>A</sub> = ${fmtP(ec.QA)}, Q<sub>B</sub> = ${fmtP(ec.QB)}` : na)}
+    ${row('Umumiy sir', dh ? `K = g<sup>ab</sup> mod p = <b>${dh.K}</b>` : na, ec ? `S = d<sub>A</sub>d<sub>B</sub>·G = ${fmtP(ec.S)}, K = x<sub>S</sub> = <b>${ec.S[0]}</b>` : na)}
+    ${row('Ikki tomon kaliti teng', dh ? (dh.eq ? '✔' : '✘') : na, ec ? (ec.eq ? '✔' : '✘') : na)}
+    ${row('Eve: to‘liq qidiruv', dh ? `${dh.tries} ta urinishda a topildi` : na, ec ? `${ec.tries} ta urinishda d<sub>A</sub> topildi` : na)}
+    ${row('Eng yaxshi ma’lum hujum', 'indeks hisobi / sonli maydon g‘alviri (subeksponensial)', 'Pollard ρ (≈ √n, eksponensial)')}
+    </table>
+    <div class="sub">Bir xil xavfsizlik darajasi uchun kalit uzunliklari (NIST SP 800-57):</div>
+    <table class="mini"><tr><th>Xavfsizlik (bit)</th><th>DH: p uzunligi</th><th>ECDH: n uzunligi</th><th>Nisbat</th></tr>
+    ${[[80, 1024, 160], [112, 2048, 224], [128, 3072, 256], [192, 7680, 384], [256, 15360, 512]].map(([s, a, b]) => `<tr><td>${s}</td><td>${a}</td><td>${b}</td><td>${(a / b).toFixed(1)} : 1</td></tr>`).join('')}</table>
+    <div class="f">Xulosa: ECDH bir xil xavfsizlikni ancha qisqa kalitlar bilan beradi, shuning uchun TLS 1.3, Signal, SSH kabi protokollarda X25519 / P-256 ishlatiladi.</div>`;
+  const ok = dh && ec && dh.eq && ec.eq;
+  h += `<div class="verdict ${ok ? 'good' : 'bad'}">${ok ? `✔ Ikkala protokolda ham Alice va Bob bir xil umumiy kalitga ega bo‘ldi (DH: ${dh.K}, ECDH: ${ec.S[0]})` : `⚠ Hisoblash to‘liq yakunlanmadi — yuqoridagi ogohlantirishlarni ko‘ring`}</div>`;
+  steps.push({ phase: 'Xulosa', title: 'DH va ECDH taqqoslash', html: h });
+  return steps;
+}
+
+function dhPart(v, steps, warn) {
+  const P1 = 'DH · Parametrlar';
+  const stop = (title, h, msg, ph = P1) => { warn.push('DH: ' + msg); steps.push({ phase: ph, title, html: h + `<div class="verdict bad">✘ ${msg}</div>` }); return null; };
+  let p, g0, a, b, m;
+  try {
+    p = readInt(v, 'p', 'p'); g0 = readInt(v, 'g', 'g'); a = readInt(v, 'xa', 'a (Alice)'); b = readInt(v, 'xb', 'b (Bob)'); m = readInt(v, 'm', 'm (Mallory)');
+  } catch (e) { return stop('Kiritilgan qiymatlar', '', e); }
+  const T1 = 'p tub sonmi? p − 1 tahlili';
+  if (p < 5 || p > 1000000) return stop(T1, `<div class="f big">p = ${p}</div>`, 'p 5 dan 1 000 000 gacha bo‘lishi kerak (o‘quv rejimi: diskret logarifm hujumini ham ko‘rsatish uchun).');
+
+  // 1) p tubligi va p − 1 tahlili
+  const pc = primeHtml(p);
+  let h = `<div class="f big">p = ${p}</div>${pc.html}`;
+  if (!pc.ok) return stop(T1, h, `p = ${p} = ${pc.div}·${p / pc.div} tub son emas — Z<sub>p</sub>* siklik guruh bo‘lmaydi. Tub p kiriting (masalan 23, 2027).`);
+  const fac = EC.factor(p - 1), qs = [...new Set(fac)], q = (p - 1) / 2, safe = isPrime(q), big = Math.max(...qs);
+  h += `<div class="verdict good">✔ ${p} — tub son</div>
+    <div class="sub">Guruh Z<sub>p</sub>* = {1, 2, …, p − 1} ko‘paytirish bo‘yicha siklik, tartibi p − 1. Diskret logarifm murakkabligi p − 1 ning tub bo‘luvchilariga bog‘liq (Pohlig–Hellman).</div>
+    <div class="f">p − 1 = ${p - 1} = <b>${fmtFac(fac)}</b> ⇒ eng katta tub bo‘luvchi ${big}</div>
+    <div class="f">q = (p − 1)/2 = ${q} ${safe ? '— tub ⇒ <b>p xavfsiz tub son (safe prime)</b> ✔' : '— tub emas ⇒ p xavfsiz tub son emas'}</div>`;
+  if (!safe) h += `<div class="warn">Amalda p = 2q + 1 (q — katta tub) ko‘rinishidagi xavfsiz tub sonlar tanlanadi (RFC 3526, RFC 7919 guruhlari), aks holda Pohlig–Hellman hujumi osonlashadi.</div>`;
+  steps.push({ phase: P1, title: T1, html: h });
+
+  // 2) g generatormi
+  const T2 = 'g generatormi? ord(g) ni hisoblash';
+  const g = mod(g0, p);
+  h = `<div class="f big">g = ${g0}${g !== g0 ? ` ≡ ${g} (mod ${p})` : ''}</div>`;
+  if (g < 2 || g > p - 2) return stop(T2, h, `g = ${g} yaroqsiz: g ∈ [2, p − 2] bo‘lishi kerak (g = 0, 1, p − 1 trivial qiymatlar beradi).`);
+  h += `<div class="sub">g generator (boshlang‘ich ildiz) bo‘lishi uchun p − 1 ning har bir tub bo‘luvchisi q<sub>i</sub> da g<sup>(p−1)/q<sub>i</sub></sup> ≢ 1 (mod p) bo‘lishi kerak:</div>`;
+  qs.forEach(qi => { const r = powQ(g, (p - 1) / qi, p); h += `<div class="f">q = ${qi}: ${g}<sup>${p - 1}/${qi}</sup> = ${g}<sup>${(p - 1) / qi}</sup> mod ${p} = <b>${r}</b> ${r === 1 ? '= 1 ✘' : '≠ 1 ✔'}</div>`; });
+  let o = p - 1;
+  for (const qi of qs) while (o % qi === 0 && powQ(g, o / qi, p) === 1) o /= qi;
+  if (p <= 200) {
+    h += `<div class="sub">g ning darajalari g<sup>k</sup> mod p (k = 1 … ${o}):</div><div class="chips">`;
+    for (let k = 1, r = g; k <= o; k++, r = r * g % p) h += `<span class="chip ${r === 1 ? 'inf' : ''}">${g}<sup>${k}</sup> = ${r}</span>`;
+    h += `</div>`;
+  }
+  const roots = []; for (let c = 2; c < p && roots.length < 8; c++) if (qs.every(qi => powQ(c, (p - 1) / qi, p) !== 1)) roots.push(c);
+  const phi = qs.reduce((x, qi) => x / qi * (qi - 1), p - 1);
+  h += `<div class="res">ord(g) = <b>${o}</b></div>`;
+  if (o === p - 1) h += `<div class="verdict good">✔ g = ${g} — generator: g<sup>k</sup> Z<sub>${p}</sub>* ning barcha ${p - 1} ta elementini hosil qiladi</div>`;
+  else {
+    h += `<div class="verdict bad">✘ g = ${g} generator emas: ord(g) = ${o} &lt; p − 1 = ${p - 1}</div>`;
+    warn.push(`DH: g = ${g} generator emas (ord(g) = ${o} &lt; ${p - 1}). Kalitlar faqat ${o} ta qiymatli qism-guruhda yotadi — Eve uchun qidiruv ${(p - 1) / o} marta osonlashadi. Generatorlar: ${roots.join(', ')}, …`);
+  }
+  h += `<div class="f">Z<sub>${p}</sub>* dagi generatorlar soni φ(p − 1) = φ(${p - 1}) = ${phi}; eng kichiklari: ${roots.join(', ')}${roots.length === 8 ? ', …' : ''}</div>`;
+  steps.push({ phase: P1, title: T2, html: h });
+
+  // 3–4) Kalitlar
+  const keyStep = (who, sym, X, pub) => {
+    const t = `${who}: ${pub} = g^${sym} mod p`;
+    let hh = `<div class="f">${who} maxfiy kalitni tasodifiy tanlaydi: ${sym} ∈ [2, p − 2] = [2, ${p - 2}] ⇒ <b>${sym} = ${X}</b></div>`;
+    if (X < 2 || X > p - 2) return stop(t, hh, `${sym} = ${X} oraliqdan tashqarida: ${sym} ∈ [2, ${p - 2}] bo‘lishi kerak.`, 'DH · Kalitlar');
+    const r = powHtml(g, X, p, `${pub} = ${g}<sup>${X}</sup> mod ${p}`);
+    hh += r.html + `<div class="keys"><div><span>${who} maxfiy</span>${sym} = ${X}</div><div><span>${who} ochiq</span>${pub} = ${r.val}</div></div>`;
+    steps.push({ phase: 'DH · Kalitlar', title: t, html: hh });
+    return r.val;
+  };
+  const A = keyStep('Alice', 'a', a, 'A'); if (A === null) return null;
+  const B = keyStep('Bob', 'b', b, 'B'); if (B === null) return null;
+  if (a === b) warn.push('DH: a = b — amalda ikki tomon mustaqil tasodifiy kalit tanlaydi.');
+
+  // 5) Almashinuv
+  h = xchg(party('xa', 'A', 'Alice', `<p>maxfiy: a = ${a}</p><p>ochiq: A = ${A}</p>`),
+    `<div class="arr r">A = ${A} ⟶</div><div class="arr l">⟵ B = ${B}</div><div class="eve">ochiq kanal · Eve ko‘radi: p = ${p}, g = ${g}, A = ${A}, B = ${B}</div>`,
+    party('xb', 'B', 'Bob', `<p>maxfiy: b = ${b}</p><p>ochiq: B = ${B}</p>`)) +
+    `<div class="sub">Alice A ni, Bob B ni ochiq kanal orqali yuboradi. Maxfiy a va b hech qachon uzatilmaydi.</div>`;
+  steps.push({ phase: 'DH · Almashinuv', title: 'Ochiq kalitlar almashinuvi', html: h });
+
+  // 6) Umumiy kalit
+  const KA = powHtml(B, a, p, `K<sub>A</sub> = ${B}<sup>${a}</sup> mod ${p}`), KB = powHtml(A, b, p, `K<sub>B</sub> = ${A}<sup>${b}</sup> mod ${p}`);
+  const e = a * b % (p - 1), K0 = powQ(g, e, p), eq = KA.val === KB.val;
+  h = `<details open><summary>Alice: K<sub>A</sub> = B<sup>a</sup> mod p = ${B}<sup>${a}</sup> mod ${p} = <b>${KA.val}</b></summary>${KA.html}</details>
+    <details open><summary>Bob: K<sub>B</sub> = A<sup>b</sup> mod p = ${A}<sup>${b}</sup> mod ${p} = <b>${KB.val}</b></summary>${KB.html}</details>
+    <div class="f">Tekshiruv: g<sup>ab</sup> = g<sup>ab mod (p−1)</sup> = ${g}<sup>${a}·${b} mod ${p - 1}</sup> = ${g}<sup>${e}</sup> mod ${p} = <b>${K0}</b></div>
+    <div class="verdict ${eq ? 'good' : 'bad'}">${eq ? `✔ K<sub>A</sub> = K<sub>B</sub> = ${KA.val} — umumiy maxfiy kalit kelishildi` : '✘ kalitlar teng emas'}</div>
+    <div class="sub">Nima uchun teng: K<sub>A</sub> = (g<sup>b</sup>)<sup>a</sup> = g<sup>ab</sup> = (g<sup>a</sup>)<sup>b</sup> = K<sub>B</sub> (mod p)</div>`;
+  steps.push({ phase: 'DH · Umumiy kalit', title: 'Umumiy kalit K = g^ab mod p', html: h });
+
+  // 7) Eve: diskret logarifm (to'liq qidiruv)
+  let x = 0, r = 1;
+  h = `<div class="sub">Eve faqat p, g, A, B ni biladi. K ni topish uchun a = log<sub>g</sub> A (diskret logarifm) kerak. Eng sodda usul — to‘liq qidiruv: g<sup>1</sup>, g<sup>2</sup>, … ni A = ${A} bilan solishtirish.</div><div class="chips">`;
+  do { x++; r = r * g % p; if (x <= 24 || r === A) h += `<span class="chip ${r === A ? 'inf' : ''}">${g}<sup>${x}</sup> = ${r}${r === A ? ' = A' : ''}</span>`; else if (x === 25) h += `<span class="chip">…</span>`; } while (r !== A && x < p);
+  const KE = powQ(B, x, p);
+  h += `</div><div class="res">Eve topdi: x = ${x} (${x} ta urinish)${x === a ? ', x = a' : `, x ≡ a (mod ord(g) = ${o})`}</div>
+    <div class="f">K<sub>Eve</sub> = B<sup>x</sup> mod p = ${B}<sup>${x}</sup> mod ${p} = <b>${KE}</b> ${KE === KA.val ? '= K ✔' : '✘'}</div>
+    <div class="f">«Kichik qadam – katta qadam» (BSGS) usuli ≈ √(p − 1) ≈ ${Math.ceil(Math.sqrt(p - 1))} qadam talab qiladi.</div>
+    <div class="verdict bad">⚠ Kichik p da DH buziladi: Eve ${x} ta urinishda umumiy kalitni tikladi</div>
+    <div class="sub">Amalda p ≥ 2048 bit: bunday guruhda diskret logarifm (sonli maydon g‘alviri bilan ham) ≈ 2<sup>112</sup> amal talab qiladi — hisoblash jihatdan imkonsiz.</div>`;
+  steps.push({ phase: 'DH · Tahlil', title: 'Passiv hujum: Eve diskret logarifmni qidiradi', html: h });
+
+  // 8) MITM
+  let mm = m; if (m < 2 || m > p - 2) { mm = 2 + mod(m - 2, p - 3); warn.push(`DH: Mallory kaliti m = ${m} oraliqdan tashqarida, m = ${mm} olindi.`); }
+  const M = powQ(g, mm, p), K1 = powQ(M, a, p), K1m = powQ(A, mm, p), K2 = powQ(M, b, p), K2m = powQ(B, mm, p);
+  h = xchg(party('xa', 'A', 'Alice', `<p>yuboradi: A = ${A}</p><p>oladi: M = ${M} (B deb o‘ylaydi)</p><p>K₁ = M<sup>a</sup> = ${M}<sup>${a}</sup> = <b>${K1}</b></p>`),
+    party('xmal', 'M', 'Mallory', `<p>m = ${mm}, M = ${g}<sup>${mm}</sup> = ${M}</p><p>A ni ushlab, Bobga M yuboradi</p><p>B ni ushlab, Alicega M yuboradi</p><p>K₁ = A<sup>m</sup> = <b>${K1m}</b></p><p>K₂ = B<sup>m</sup> = <b>${K2m}</b></p>`),
+    party('xb', 'B', 'Bob', `<p>yuboradi: B = ${B}</p><p>oladi: M = ${M} (A deb o‘ylaydi)</p><p>K₂ = M<sup>b</sup> = ${M}<sup>${b}</sup> = <b>${K2}</b></p>`)) +
+    `<div class="f">Alice ↔ Mallory kaliti: K₁ = ${M}<sup>${a}</sup> = ${A}<sup>${mm}</sup> = <b>${K1}</b> ${K1 === K1m ? '✔' : '✘'}</div>
+    <div class="f">Bob ↔ Mallory kaliti: K₂ = ${M}<sup>${b}</sup> = ${B}<sup>${mm}</sup> = <b>${K2}</b> ${K2 === K2m ? '✔' : '✘'}</div>
+    <div class="verdict bad">⚠ Autentifikatsiyasiz DH «o‘rtadagi odam» hujumiga zaif: Mallory ikkala kalitni ham biladi, xabarlarni o‘qib, qayta shifrlab uzatadi</div>
+    <div class="sub">Himoya: ochiq kalitlarni raqamli imzo bilan tasdiqlash (ECDSA, GOST 34.10 modullari), sertifikatlar (TLS), STS protokoli.</div>`;
+  steps.push({ phase: 'DH · Tahlil', title: 'Faol hujum: «o‘rtadagi odam» (MITM)', html: h });
+  return { p, g, o, a, b, A, B, K: KA.val, eq, tries: x };
+}
+
+function ecdhPart(v, steps, warn) {
+  const P1 = 'ECDH · Parametrlar';
+  const stop = (title, h, msg, ph = P1) => { warn.push('ECDH: ' + msg); steps.push({ phase: ph, title, html: h + `<div class="verdict bad">✘ ${msg}</div>` }); return null; };
+  let p, a, b, da, db;
+  try { p = readInt(v, 'ep', 'Egri chiziq p'); a = readInt(v, 'ea', 'a'); b = readInt(v, 'eb', 'b'); da = readInt(v, 'da', 'd_A'); db = readInt(v, 'db', 'd_B'); }
+  catch (e) { return stop('Kiritilgan qiymatlar', '', e); }
+  const T1 = 'Egri chiziq: p tubligi va singulyarlik';
+  if (p < 5 || p > 2000) return stop(T1, `<div class="f big">p = ${p}</div>`, 'Egri chiziq uchun p 5 dan 2000 gacha bo‘lishi kerak (o‘quv rejimi, barcha nuqtalar sanaladi).');
+  const pc = primeHtml(p);
+  let h = `<div class="f big">E: y² ≡ x³ + ${mod(a, p)}x + ${mod(b, p)} (mod ${p})</div>${pc.html}`;
+  if (!pc.ok) return stop(T1, h, `p = ${p} tub son emas — F<sub>p</sub> maydon bo‘lmaydi.`);
+  a = mod(a, p); b = mod(b, p);
+  const disc = mod(4 * a ** 3 + 27 * b * b, p);
+  h += `<div class="f">p = ${p} tub ✔</div><div class="sub">Singulyar emaslik: Δ = 4a³ + 27b² ≢ 0 (mod p)</div>
+    <div class="f">4·${a}³ + 27·${b}² = ${4 * a ** 3} + ${27 * b * b} = ${4 * a ** 3 + 27 * b * b} ≡ <b>${disc}</b> (mod ${p})</div>`;
+  if (disc === 0) return stop(T1, h, `Egri chiziq singulyar (Δ ≡ 0 mod ${p}) — boshqa a yoki b tanlang.`);
+  h += `<div class="verdict good">✔ Δ = ${disc} ≠ 0 — egri chiziq singulyar emas</div>`;
+  steps.push({ phase: P1, title: T1, html: h });
+
+  // G
+  const c = new Curve(a, b, p), Gs = String(v('G')).trim();
+  let pref = null, note = '';
+  if (Gs) {
+    const pt = parsePt(Gs);
+    if (!pt) { note = `<div class="warn">G = “${Gs}” formati noto‘g‘ri — G avtomatik tanlanadi</div>`; warn.push(`ECDH: G formati noto‘g‘ri (“${Gs}”), G avtomatik tanlandi. Masalan “5, 1” ko‘rinishida kiriting.`); }
+    else {
+      const P = [mod(pt[0], p), mod(pt[1], p)];
+      if (!c.on(P)) { note = `<div class="warn">G = ${fmtP(P)}: y² mod ${p} = ${mod(P[1] * P[1], p)}, x³ + ax + b mod ${p} = ${c.rhs(P[0])} — egri chiziqda yotmaydi. G avtomatik tanlanadi.</div>`; warn.push(`ECDH: G = ${fmtP(P)} egri chiziqda yotmaydi, G avtomatik tanlandi.`); }
+      else pref = P;
+    }
+  }
+  const g = findG(c, pref);
+  if (!g.G || g.n < 5) return stop('Nuqtalarni sanash va G ni topish', note + g.html, 'Yetarli katta tub tartibli nuqta topilmadi — boshqa parametrlar tanlang.');
+  const { G, n, N } = g;
+  if (pref && fmtP(pref) !== fmtP(G)) { const po = c.order(pref); note += `<div class="warn">Kiritilgan G = ${fmtP(pref)} tartibi ${po} — bu eng katta tub tartib n = ${n} emas (kichik qism-guruh). Shuning uchun G = ${fmtP(G)} olindi.</div>`; warn.push(`ECDH: kiritilgan G = ${fmtP(pref)} kichik qism-guruhda (tartibi ${po}), G = ${fmtP(G)} olindi.`); }
+  if (N === p) { note += `<div class="warn">#E = p = ${p} — anomal egri chiziq: Smart hujumi ECDLP ni polinomial vaqtda yechadi. Amalda bunday egri chiziqlar ishlatilmaydi.</div>`; warn.push(`ECDH: #E = p = ${p} (anomal egri chiziq) — kriptografik jihatdan zaif, boshqa a, b tanlang.`); }
+  steps.push({ phase: P1, title: 'Nuqtalarni sanash va G ni topish', html: note + g.html + plot(c, g) });
+
+  // Kalitlar
+  const fixD = (d, sym) => {
+    if (d >= 1 && d <= n - 1) return d;
+    const r = mod(d, n);
+    if (r === 0) return null;
+    warn.push(`ECDH: ${sym} = ${d} oraliqdan tashqarida, ${sym} = ${d} mod ${n} = ${r} olindi.`); return r;
+  };
+  const da1 = fixD(da, 'd_A'), db1 = fixD(db, 'd_B');
+  if (da1 === null || db1 === null) return stop('Ochiq kalitlar Q = d·G', `<div class="f">d ∈ [1, n − 1] = [1, ${n - 1}]</div>`, `${da1 === null ? `d_A = ${da}` : `d_B = ${db}`} ≡ 0 (mod n = ${n}) — maxfiy kalit 0 bo‘lishi mumkin emas (ochiq kalit O bo‘lib qoladi).`, 'ECDH · Kalitlar');
+  da = da1; db = db1;
+  const QA = c.mul(da, G, 'G'), QB = c.mul(db, G, 'G');
+  h = `<div class="f">Maxfiy kalitlar: d ∈ [1, n − 1] = [1, ${n - 1}] ⇒ <b>d<sub>A</sub> = ${da}</b>, <b>d<sub>B</sub> = ${db}</b></div>
+    <details open><summary>Alice: Q<sub>A</sub> = d<sub>A</sub>·G = ${da}·G = <b>${fmtP(QA.R)}</b></summary>${QA.html}</details>
+    <details open><summary>Bob: Q<sub>B</sub> = d<sub>B</sub>·G = ${db}·G = <b>${fmtP(QB.R)}</b></summary>${QB.html}</details>
+    <div class="keys"><div><span>Alice</span>d<sub>A</sub> = ${da} · Q<sub>A</sub> = ${fmtP(QA.R)}</div><div><span>Bob</span>d<sub>B</sub> = ${db} · Q<sub>B</sub> = ${fmtP(QB.R)}</div></div>`;
+  steps.push({ phase: 'ECDH · Kalitlar', title: 'Ochiq kalitlar Q = d·G', html: h });
+
+  // Almashinuv + ochiq kalitni tekshirish
+  h = xchg(party('xa', 'A', 'Alice', `<p>maxfiy: d<sub>A</sub> = ${da}</p><p>ochiq: Q<sub>A</sub> = ${fmtP(QA.R)}</p>`),
+    `<div class="arr r">Q<sub>A</sub> = ${fmtP(QA.R)} ⟶</div><div class="arr l">⟵ Q<sub>B</sub> = ${fmtP(QB.R)}</div><div class="eve">ochiq kanal · Eve ko‘radi: E, G, n, Q<sub>A</sub>, Q<sub>B</sub></div>`,
+    party('xb', 'B', 'Bob', `<p>maxfiy: d<sub>B</sub> = ${db}</p><p>ochiq: Q<sub>B</sub> = ${fmtP(QB.R)}</p>`)) +
+    `<div class="sub">Qabul qilingan ochiq kalitni tekshirish (SP 800-56A, «noto‘g‘ri egri chiziq» hujumidan himoya):</div>`;
+  for (const [nm, Q] of [['Q<sub>A</sub>', QA.R], ['Q<sub>B</sub>', QB.R]]) {
+    const L = mod(Q[1] * Q[1], p), R = c.rhs(Q[0]), nQ = c.mulQ(n, Q);
+    h += `<div class="f">${nm} = ${fmtP(Q)}: ≠ O ✔ · y² ≡ ${L}, x³ + ax + b ≡ ${R} ${L === R ? '⇒ egri chiziqda ✔' : '✘'} · n·${nm} = ${n}·${fmtP(Q)} = ${fmtP(nQ)} ${nQ ? '✘' : '✔'}</div>`;
+  }
+  steps.push({ phase: 'ECDH · Almashinuv', title: 'Ochiq kalitlar almashinuvi va tekshiruvi', html: h });
+
+  // Umumiy sir
+  const SA = c.mul(da, QB.R, 'Q<sub>B</sub>'), SB = c.mul(db, QA.R, 'Q<sub>A</sub>'), eq = fmtP(SA.R) === fmtP(SB.R);
+  const e = da * db % n, S0 = c.mulQ(e, G);
+  h = `<details open><summary>Alice: S<sub>A</sub> = d<sub>A</sub>·Q<sub>B</sub> = ${da}·${fmtP(QB.R)} = <b>${fmtP(SA.R)}</b></summary>${SA.html}</details>
+    <details open><summary>Bob: S<sub>B</sub> = d<sub>B</sub>·Q<sub>A</sub> = ${db}·${fmtP(QA.R)} = <b>${fmtP(SB.R)}</b></summary>${SB.html}</details>
+    <div class="f">Tekshiruv: (d<sub>A</sub>·d<sub>B</sub> mod n)·G = (${da}·${db} mod ${n})·G = ${e}·G = <b>${fmtP(S0)}</b></div>
+    <div class="verdict ${eq ? 'good' : 'bad'}">${eq ? `✔ S<sub>A</sub> = S<sub>B</sub> = ${fmtP(SA.R)} — umumiy kalit K = x<sub>S</sub> = ${SA.R[0]}` : '✘ nuqtalar teng emas'}</div>
+    <div class="sub">Nima uchun teng: d<sub>A</sub>·Q<sub>B</sub> = d<sub>A</sub>·(d<sub>B</sub>·G) = d<sub>B</sub>·(d<sub>A</sub>·G) = d<sub>B</sub>·Q<sub>A</sub>. Amalda K = x<sub>S</sub> dan KDF (masalan HKDF-SHA256) orqali simmetrik kalit olinadi.</div>`;
+  steps.push({ phase: 'ECDH · Umumiy kalit', title: 'Umumiy sir S = d_A·d_B·G', html: h });
+
+  // Eve: ECDLP (to'liq qidiruv)
+  let R = null, k = 0;
+  h = `<div class="sub">Eve d<sub>A</sub> ni topishi uchun Q<sub>A</sub> = k·G tenglamani yechishi kerak (ECDLP). To‘liq qidiruv: G, 2G, 3G, … ni Q<sub>A</sub> = ${fmtP(QA.R)} bilan solishtiradi.</div><div class="chips">`;
+  do { k++; R = c.add(R, G, false).R; const hit = fmtP(R) === fmtP(QA.R); if (k <= 24 || hit) h += `<span class="chip ${hit ? 'inf' : ''}">${k}G = ${fmtP(R)}</span>`; else if (k === 25) h += `<span class="chip">…</span>`; } while (fmtP(R) !== fmtP(QA.R) && k < n);
+  const SE = c.mulQ(k, QB.R);
+  h += `</div><div class="res">Eve topdi: d<sub>A</sub> = ${k} (${k} ta urinish)</div>
+    <div class="f">S<sub>Eve</sub> = ${k}·Q<sub>B</sub> = <b>${fmtP(SE)}</b> ${fmtP(SE) === fmtP(SA.R) ? '= S ✔' : '✘'}</div>
+    <div class="f">Pollard ρ usuli ≈ √(πn/4) ≈ ${Math.ceil(Math.sqrt(Math.PI * n / 4))} qadam talab qiladi.</div>
+    <div class="verdict bad">⚠ Kichik egri chiziqda ECDH ham buziladi: ${k} ta urinish yetarli bo‘ldi</div>
+    <div class="sub">Amalda n ≈ 2<sup>256</sup> (P-256, Curve25519): Pollard ρ ≈ 2<sup>128</sup> amal — imkonsiz. ECDH ham autentifikatsiyasiz MITM hujumiga zaif (DH dagi kabi).</div>`;
+  steps.push({ phase: 'ECDH · Tahlil', title: 'Passiv hujum: Eve ECDLP ni qidiradi', html: h });
+  return { p, G, n, N, da, db, QA: QA.R, QB: QB.R, S: SA.R, eq, tries: k };
 }
 
 route();
