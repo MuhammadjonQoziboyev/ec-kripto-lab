@@ -51,23 +51,17 @@ window.addEventListener('hashchange', route);
 
 function renderHome() {
   app.innerHTML = `
-  <header class="hero">
-    <div class="eyebrow">Elliptik egri chiziqli kriptografiya</div>
-    <h1>Kripto Laboratoriya</h1>
-    <p>Har bir algoritmni qadam-baqadam ko‘ring: nuqtalarni sanash, generator G ni topish, λ hisoblash, teskari elementlar, imzo va shifrlash — barchasi formula va raqamlar bilan.</p>
-  </header>
-  <main class="cards">
-    ${Object.entries(MODULES).map(([k, m], i) => `
-      <a class="card card-${k}" href="#${k}">
-        <div class="card-ico">${m.icon}</div>
-        <div class="card-tag">${m.tag}</div>
+  <div class="hbar"><span class="hlogo">EC·LAB</span><span class="hsep"></span><span class="hsub">zamonaviy kriptografiya modullari</span></div>
+  <svg class="hcurve" viewBox="0 0 600 600" aria-hidden="true"><path d="M330 40C250 150 150 220 150 300s100 150 180 260M150 300c-40-60-90-80-130-60s-30 100 10 120 80-10 120-60"/></svg>
+  <main class="tiles">
+    <div class="brand"><b>KRIPTO</b><span>Zamonaviy kriptografiya<br>laboratoriyasi</span></div>
+    ${Object.entries(MODULES).map(([k, m]) => `
+      <a class="tile tile-${k}" href="#${k}" title="${m.full}. ${m.desc}">
+        <div class="tile-ico">${m.icon}</div>
         <h2>${m.title}</h2>
-        <div class="card-full">${m.full}</div>
-        <p>${m.desc}</p>
-        <span class="card-go">Modulga kirish →</span>
       </a>`).join('')}
   </main>
-  <footer class="foot">y² ≡ x³ + ax + b (mod p) · o‘quv maqsadidagi kichik parametrlar</footer>`;
+  <footer class="foot">y² ≡ x³ + ax + b (mod p) · g<sup>ab</sup> mod p · o‘quv maqsadidagi kichik parametrlar</footer>`;
 }
 
 function field(id, label, val, type = 'number') {
