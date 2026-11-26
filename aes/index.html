@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AES — qadamma-qadam</title>
+<meta name="description" content="AES shifrlash algoritmi har bir bayti, har bir bitigacha vizual tushuntirilgan interaktiv qo'llanma.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b1020'/%3E%3Cpath d='M8 22 16 8l8 14M11 18h10' stroke='%2322d3ee' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<nav class="top">
+  <a class="logo" href="#top"><span>AES</span></a>
+  <div class="links">
+    <a href="#nima" data-i18n="nav.what"></a>
+    <a href="#operatsiyalar" data-i18n="nav.ops"></a>
+    <a href="#xor" data-i18n="nav.xor"></a>
+    <div class="langsw" role="group" aria-label="Language"><button data-l="uz">UZ</button><button data-l="ru">RU</button><button data-l="en">EN</button></div>
+    <a href="#app" class="cta" data-i18n="nav.start"></a>
+  </div>
+</nav>
+
+<header id="top" class="hero">
+  <div class="hero-text">
+    <p class="eyebrow" data-i18n="hero.eyebrow"></p>
+    <h1><span data-i18n="hero.l1"></span><br><span class="grad" data-i18n="hero.l2"></span></h1>
+    <p class="lead" data-i18n="hero.lead"></p>
+    <div class="hero-btns">
+      <a href="#app" class="btn primary" data-i18n="hero.btn1"></a>
+      <a href="#nima" class="btn ghost" data-i18n="hero.btn2"></a>
+    </div>
+    <p class="note" data-i18n="hero.note"></p>
+  </div>
+  <div class="hero-grid" id="heroGrid" aria-hidden="true"></div>
+</header>
+
+<main>
+<section id="nima" class="sec reveal">
+  <div class="sec-head"><h2 data-i18n="s1.h"></h2></div>
+  <p class="sec-lead" data-i18n="s1.lead"></p>
+  <div class="flow">
+    <div class="flow-box"><small data-i18n="s1.plain"></small><b id="scr1"></b></div>
+    <div class="flow-arrow"><span data-i18n="s1.key"></span><i></i></div>
+    <div class="flow-box core"><small data-i18n="s1.algo"></small><b>AES</b></div>
+    <div class="flow-arrow"><i></i></div>
+    <div class="flow-box"><small data-i18n="s1.cipher"></small><b class="mono" id="scr2">9F 3A C1 07 E2 …</b></div>
+  </div>
+  <div class="cards three">
+    <div class="card"><div class="ico">🔐</div><h3 data-i18n="s1.c1h"></h3><p data-i18n="s1.c1p"></p></div>
+    <div class="card"><div class="ico">🧱</div><h3 data-i18n="s1.c2h"></h3><p data-i18n="s1.c2p"></p></div>
+    <div class="card"><div class="ico">🔁</div><h3 data-i18n="s1.c3h"></h3><p data-i18n="s1.c3p"></p></div>
+  </div>
+</section>
+
+<section id="operatsiyalar" class="sec reveal">
+  <div class="sec-head"><h2 data-i18n="s2.h"></h2></div>
+  <p class="sec-lead" data-i18n="s2.lead"></p>
+  <div class="ops">
+    <article class="op sub">
+      <div class="op-ico"><div class="mini swap"><b>A</b><b>B</b><b>C</b></div></div>
+      <h3>SubBytes</h3><p class="tag" data-i18n="s2.tag.sub"></p><p data-i18n="s2.p.sub"></p>
+    </article>
+    <article class="op shift">
+      <div class="op-ico"><div class="mini slide"><b>1</b><b>2</b><b>3</b><b>4</b></div></div>
+      <h3>ShiftRows</h3><p class="tag" data-i18n="s2.tag.shift"></p><p data-i18n="s2.p.shift"></p>
+    </article>
+    <article class="op mix">
+      <div class="op-ico"><div class="mini blend"><i></i><i></i><i></i></div></div>
+      <h3>MixColumns</h3><p class="tag" data-i18n="s2.tag.mix"></p><p data-i18n="s2.p.mix"></p>
+    </article>
+    <article class="op key">
+      <div class="op-ico"><div class="mini lock">🔑</div></div>
+      <h3>AddRoundKey</h3><p class="tag" data-i18n="s2.tag.key"></p><p data-i18n="s2.p.key"></p>
+    </article>
+  </div>
+
+  <h3 class="sub-h" data-i18n="s2.order"></h3>
+  <div class="pipeline" id="pipeline">
+    <div class="pl-node start" data-i18n="pl.start"></div>
+    <div class="pl-arrow"></div>
+    <div class="pl-node key"><span data-i18n="pl.r0"></span><small data-i18n="pl.r0s"></small></div>
+    <div class="pl-arrow"></div>
+    <div class="pl-group">
+      <div class="pl-label" data-i18n="pl.loop"></div>
+      <div class="pl-row">
+        <div class="pl-node sub">SubBytes</div><div class="pl-arrow"></div>
+        <div class="pl-node shift">ShiftRows</div><div class="pl-arrow"></div>
+        <div class="pl-node mix">MixColumns</div><div class="pl-arrow"></div>
+        <div class="pl-node key">AddRoundKey</div>
+      </div>
+    </div>
+    <div class="pl-arrow"></div>
+    <div class="pl-node last"><span data-i18n="pl.last"></span><small data-i18n="pl.lasts"></small></div>
+    <div class="pl-arrow"></div>
+    <div class="pl-node end" data-i18n="pl.end"></div>
+  </div>
+</section>
+
+<section id="xor" class="sec reveal">
+  <div class="sec-head"><h2 data-i18n="s3.h"></h2></div>
+  <p class="sec-lead" data-i18n="s3.lead"></p>
+  <div class="xorlab" id="xorlab"></div>
+  <div class="cards two">
+    <div class="card"><h3 data-i18n="s3.c1h"></h3><p data-i18n="s3.c1p"></p></div>
+    <div class="card"><h3 data-i18n="s3.c2h"></h3><p data-i18n="s3.c2p"></p></div>
+  </div>
+</section>
+
+<section id="player" class="sec player-sec">
+  <div class="sec-head"><h2 data-i18n="s4.h"></h2></div>
+  <p class="sec-lead" data-i18n="s4.lead"></p>
+
+  <details class="inputs card" id="inputsBox">
+    <summary data-i18n="in.sum"></summary>
+    <div class="in-grid">
+      <div class="seg" id="modeSeg"><button data-m="text" class="on" data-i18n="in.text"></button><button data-m="hex" data-i18n="in.hex"></button></div>
+      <label><span data-i18n="in.pt"></span><input id="inPt" spellcheck="false" autocomplete="off"></label>
+      <label><span data-i18n="in.key"></span><input id="inKey" spellcheck="false" autocomplete="off"></label>
+      <div class="in-btns">
+        <button class="btn primary sm" id="inApply" data-i18n="in.apply"></button>
+        <button class="btn ghost sm" id="inFips" data-i18n="in.fips"></button>
+      </div>
+      <p class="hint" id="inHint"></p>
+    </div>
+  </details>
+
+  <div class="app" id="app">
+    <div class="progress">
+      <div class="rounds" id="rounds"></div>
+      <div class="opchips" id="opchips"></div>
+      <div class="bar"><i id="barFill"></i></div>
+    </div>
+
+    <div class="stage" id="stage" data-op="prep">
+      <div class="gridwrap">
+        <div class="gridcap"><span id="gridTitle" data-i18n="ui.state"></span></div>
+        <div class="gframe">
+          <div class="colh"><span>0</span><span>1</span><span>2</span><span>3</span></div>
+          <div class="rowh"><span>0</span><span>1</span><span>2</span><span>3</span></div>
+          <div class="grid" id="grid"></div>
+        </div>
+        <div class="gnote" id="gNote"></div>
+      </div>
+      <div class="panel" id="panel">
+        <div class="ptitle"><span class="badge" id="badge"></span><h3 id="title"></h3></div>
+        <p class="say" id="say"></p>
+        <div class="viz" id="viz"></div>
+      </div>
+    </div>
+
+    <div class="ctrl">
+      <button class="btn ghost" id="bPrevRound" data-i18n-title="ctl.tipPrev">⏮</button>
+      <button class="btn ghost" id="bPrev" data-i18n="ctl.prev"></button>
+      <button class="btn primary big" id="bNext" data-i18n="ctl.next"></button>
+      <button class="btn ghost" id="bNextOp" data-i18n-title="ctl.tipOp">⏭</button>
+      <div class="ctrl-r">
+        <button class="btn ghost" id="bAuto" data-i18n="ctl.auto"></button>
+        <div class="seg small" id="spdSeg" data-i18n-title="ctl.tipSpeed">
+          <button data-s="1.6" data-i18n="ctl.slow"></button><button data-s="1" class="on" data-i18n="ctl.norm"></button><button data-s="0.6" data-i18n="ctl.fast"></button>
+        </div>
+        <span class="counter" id="counter"></span>
+      </div>
+    </div>
+  </div>
+  <p class="kbd-hint" data-i18n="ctl.keys"></p>
+</section>
+</main>
+
+<footer>
+  <p data-i18n="foot"></p>
+</footer>
+
+<script type="module" src="fx.js"></script>
+<script type="module" src="app.js"></script>
+<script src="../home-link.js"></script>
+</body>
+</html>

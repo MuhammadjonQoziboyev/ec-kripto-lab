@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SHA-256 — asoslar</title>
+<meta name="description" content="SHA-256 xesh algoritmi har bir bitigacha, rangli aylanuvchi halqalar bilan vizual tushuntirilgan interaktiv qo'llanma.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b1020'/%3E%3Ccircle cx='16' cy='16' r='9' stroke='%23f472b6' stroke-width='3' fill='none' stroke-dasharray='4 3'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="header.css">
+
+</head>
+<body>
+<script src="header.js"></script>
+
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
+
+<header id="top" class="hero">
+  <div class="hero-text">
+    <p class="eyebrow">Interaktiv qo'llanma</p>
+    <h1>SHA-256<br><span class="grad">halqalar tilida</span></h1>
+    <p class="lead">Bitcoin, parollar, raqamli imzolar, fayl tekshiruvi — hammasi shu algoritmga tayanadi. Bu yerda uni <b>noldan</b>, hech narsani o'tkazib yubormasdan ko'rsatamiz. Har bir <b>32 bitli son</b> — rangli aylana, har bir qadam — ko'z oldingizda.</p>
+    <div class="hero-btns">
+      <a href="player.html" class="btn primary">▶ Xeshlashni boshlash</a>
+      <a href="#nima" class="btn ghost">Avval asoslarini o'qiy</a>
+    </div>
+    <p class="note">Hech qanday oldingi bilim kerak emas. Hammasi brauzeringizda ishlaydi.</p>
+  </div>
+  <div class="hero-art" id="heroArt" aria-hidden="true"></div>
+</header>
+
+<main>
+<section id="nima" class="sec reveal">
+  <div class="sec-head"><span class="num">01</span><h2>Xesh nima?</h2></div>
+  <p class="sec-lead">Tasavvur qiling: har qanday kitobni, rasmni yoki parolni solsangiz, <b>doim bir xil uzunlikdagi "barmoq izi"</b> chiqaradigan mashina. Bu iz — <b>xesh</b>. SHA-256 esa shunday mashinalardan biri; izi har doim <b>256 bit</b> (64 ta hex belgi).</p>
+
+  <div class="cards three">
+    <div class="card"><div class="ico">🧬</div><h3>Barmoq izi</h3><p>Matn qisqa yoki juda uzun bo'lsin — xesh har doim bir xil uzunlikda: 256 bit.</p></div>
+    <div class="card"><div class="ico">🥩</div><h3>Qaytmaydi</h3><p>Go'sht qiymasidan go'shtni qayta yig'ib bo'lmaganidek, xeshdan matnni tiklab bo'lmaydi.</p></div>
+    <div class="card"><div class="ico">🦋</div><h3>Ta'sirchan</h3><p>Matnda <b>bitta harf</b> o'zgarsa, xeshning taxminan <b>yarmi</b> o'zgaradi. Quyida o'zingiz ko'ring.</p></div>
+  </div>
+
+  <h3 class="sub-h">Sinab ko'ring: ikki deyarli bir xil matn</h3>
+  <div class="aval card">
+    <div class="aval-in">
+      <label>Matn A <input id="avA" value="Salom" maxlength="60" spellcheck="false"></label>
+      <label>Matn B <input id="avB" value="salom" maxlength="60" spellcheck="false"></label>
+    </div>
+    <div class="aval-grids">
+      <div><div class="gl">A ning xeshi <code id="avHexA"></code></div><div class="bitgrid" id="gridA"></div></div>
+      <div><div class="gl">B ning xeshi <code id="avHexB"></code></div><div class="bitgrid" id="gridB"></div></div>
+    </div>
+    <p class="aval-res" id="avRes"></p>
+    <p class="legend"><i class="lg one"></i> bit = 1 &nbsp; <i class="lg zero"></i> bit = 0 &nbsp; <i class="lg diff"></i> A dan farq qiladigan bit</p>
+  </div>
+</section>
+
+<section id="bitlar" class="sec reveal">
+  <div class="sec-head"><span class="num">02</span><h2>Halqa va oddiy amallar</h2></div>
+  <p class="sec-lead">SHA-256 faqat <b>32 bitli sonlar</b> bilan ishlaydi. Biz har bir shunday sonni <b>halqa</b> shaklida chizamiz: 32 ta nuqta, tepada 31-bit, soat mili bo'yicha 0-bitgacha. <span class="on-dot"></span> yonib turgan nuqta = <b>1</b>, xira nuqta = <b>0</b>.</p>
+
+  <div class="ringdemo card">
+    <div class="rd-ring" id="rdRing"></div>
+    <div class="rd-info">
+      <label>Sonni hex ko'rinishda yozing (8 belgi):
+        <input id="rdHex" value="6a09e667" maxlength="8" spellcheck="false"></label>
+      <div class="rd-bits" id="rdBits"></div>
+      <p class="muted">Hex — sonni yozishning qisqa usuli: har 1 hex belgi = 4 bit. 8 belgi = 32 bit.</p>
+      <button class="btn sm" id="rdRand">🎲 Tasodifiy son</button>
+    </div>
+  </div>
+
+  <p class="sec-lead" style="margin-top:34px">Butun SHA-256 faqat <b>oltita</b> amaldan iborat. Har birini sekin ko'rsatamiz — "▶" bosib qayta o'ynating.</p>
+  <div class="opgrid" id="opgrid"></div>
+</section>
+
+<section id="jadvallar" class="sec reveal">
+  <div class="sec-head"><span class="num">03</span><h2>Standart jadvallar</h2></div>
+  <p class="sec-lead">SHA-256 ichida <b>ikkita qat'iy jadval</b> bor. Ular hammada bir xil — shuning uchun bir xil matn hamma yerda bir xil xesh beradi. Ular tasodifiy emas: <b>tub sonlarning ildizlaridan</b> hisoblanadi. Bu "yengimda hech narsa yo'q" usuli: yaratuvchilar yashirin eshik qoldirmaganini hamma o'zi tekshirib ko'ra oladi.</p>
+
+  <h3 class="sub-h">① Boshlang'ich qiymatlar H0…H7 <small>(dastlabki 8 ta tub sonning kvadrat ildizi)</small></h3>
+  <div class="card tablecard"><div class="tscroll"><table class="tbl" id="tblH"></table></div></div>
+
+  <h3 class="sub-h">② 64 ta konstanta K0…K63 <small>(dastlabki 64 ta tub sonning kub ildizi)</small></h3>
+  <p class="muted">Katakni bosing — u qanday hosil bo'lganini ko'rasiz. Har bir raundda bittasi "kirib keladi".</p>
+  <div class="kwrap">
+    <div class="kgrid" id="kgrid"></div>
+    <div class="kinfo card" id="kinfo"></div>
+  </div>
+
+  <h3 class="sub-h">③ Aralashtirish funksiyalari <small>(halqani aylantirib, qo'shib)</small></h3>
+  <div class="card tablecard"><div class="tscroll"><table class="tbl" id="tblSig"></table></div></div>
+  <p class="muted">ROTR n — halqani n qadam aylantirish. SHR n — aylantirib, chiqib ketgan bitlarni nolga aylantirish. ⊕ — XOR.</p>
+</section>
+
+</main>
+
+<footer class="foot">
+  <p>SHA-256 (FIPS 180-4) — o'quv maqsadidagi vizualizatsiya. Natija brauzerning o'z SHA-256 bilan tekshiriladi.</p>
+</footer>
+
+<script type="module" src="learn.js"></script>
+<script src="../home-link.js"></script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuznyechik</title>
+<meta name="description" content="Kuznyechik (GOST R 34.12-2015) shifrlash algoritmi: har bir qatlam qadamma-qadam, interaktiv.">
+<meta name="theme-color" content="#070a14">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23070a14'/%3E%3Cpath d='M8 9h4v6l6-6h5l-7 7 7 7h-5l-6-6v6H8z' fill='%2338e1ff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top"><span class="logo">K</span><span>Kuznyechik</span></a>
+    <nav class="links">
+      <a href="#intro" data-i18n="nav_intro"></a>
+      <a href="#ops" data-i18n="nav_ops"></a>
+      <a href="#lab" data-i18n="nav_lab"></a>
+      <a href="#app" data-i18n="nav_live"></a>
+      <a href="#test" data-i18n="nav_test"></a>
+    </nav>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="uz">UZ</button>
+      <button type="button" data-lang="ru">RU</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-in">
+      <div class="hero-text">
+        <span class="eyebrow" data-i18n="hero_eyebrow"></span>
+        <h1 data-i18n="hero_title"></h1>
+        <p class="sub" data-i18n="hero_sub"></p>
+        <div class="cta">
+          <a class="btn primary" href="#app" data-i18n="hero_start"></a>
+          <a class="btn ghost" href="#intro" data-i18n="hero_learn"></a>
+        </div>
+        <div class="stats">
+          <div><b>128</b><span data-i18n="stat_block"></span></div>
+          <div><b>256</b><span data-i18n="stat_key"></span></div>
+          <div><b>10</b><span data-i18n="stat_rounds"></span></div>
+        </div>
+      </div>
+      <div class="hero-vis glass" aria-hidden="true">
+        <div class="hero-grid" id="heroGrid"></div>
+        <div class="hero-cap"><span class="dot x"></span>X <span class="dot s"></span>S <span class="dot l"></span>L <span class="dot k"></span>K</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="intro" class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal"><h2 data-i18n="intro_title"></h2><p data-i18n="intro_lead"></p></div>
+      <div class="cards4">
+        <article class="card glass reveal">
+          <svg viewBox="0 0 24 24" class="ico"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+          <h3 data-i18n="ic_enc_t"></h3><p data-i18n="ic_enc_d"></p>
+        </article>
+        <article class="card glass reveal">
+          <svg viewBox="0 0 24 24" class="ico"><circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M21 12v2"/></svg>
+          <h3 data-i18n="ic_sym_t"></h3><p data-i18n="ic_sym_d"></p>
+        </article>
+        <article class="card glass reveal">
+          <svg viewBox="0 0 24 24" class="ico"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+          <h3 data-i18n="ic_blk_t"></h3><p data-i18n="ic_blk_d"></p>
+        </article>
+        <article class="card glass reveal">
+          <svg viewBox="0 0 24 24" class="ico"><path d="M20 12a8 8 0 11-3-6.2"/><path d="M20 4v5h-5"/></svg>
+          <h3 data-i18n="ic_rnd_t"></h3><p data-i18n="ic_rnd_d"></p>
+        </article>
+      </div>
+
+      <div class="pipe-wrap glass reveal">
+        <h3 data-i18n="pipe_title"></h3>
+        <div class="pipe">
+          <span class="pn io" data-i18n="pipe_plain"></span><span class="pa">→</span>
+          <span class="pn x">X[K<sub>1</sub>]</span><span class="pa">→</span>
+          <span class="pgrp"><span class="pn s">S</span><span class="pn l">L</span><span class="pn x">X[K<sub>i+1</sub>]</span><em data-i18n="pipe_rep"></em></span><span class="pa">→</span>
+          <span class="pn io" data-i18n="pipe_cipher"></span>
+        </div>
+        <p class="note" data-i18n="pipe_note"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="ops" class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal"><h2 data-i18n="ops_title"></h2><p data-i18n="ops_lead"></p></div>
+      <div class="cards4 ops">
+        <article class="card glass reveal op-x">
+          <div class="op-tag">X</div>
+          <h3 data-i18n="op_x_t"></h3>
+          <p class="analogy" data-i18n="op_x_an"></p>
+          <p data-i18n="op_x_d"></p>
+          <code>r = a ⊕ k</code>
+        </article>
+        <article class="card glass reveal op-s">
+          <div class="op-tag">S</div>
+          <h3 data-i18n="op_s_t"></h3>
+          <p class="analogy" data-i18n="op_s_an"></p>
+          <p data-i18n="op_s_d"></p>
+          <code>r = π[a]</code>
+        </article>
+        <article class="card glass reveal op-l">
+          <div class="op-tag">L</div>
+          <h3 data-i18n="op_l_t"></h3>
+          <p class="analogy" data-i18n="op_l_an"></p>
+          <p data-i18n="op_l_d"></p>
+          <code>L = R<sup>16</sup></code>
+        </article>
+        <article class="card glass reveal op-k">
+          <div class="op-tag">K</div>
+          <h3 data-i18n="op_k_t"></h3>
+          <p class="analogy" data-i18n="op_k_an"></p>
+          <p data-i18n="op_k_d"></p>
+          <code>(a1, a0) ← (L(S(a1⊕C)) ⊕ a0, a1)</code>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="lab" class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal"><h2 data-i18n="lab_title"></h2><p data-i18n="lab_lead"></p></div>
+      <div class="lab glass reveal">
+        <div class="lab-main">
+          <div id="labBox"></div>
+          <div class="lab-btns">
+            <button type="button" class="btn ghost sm" id="labRand" data-i18n="lab_rand"></button>
+            <button type="button" class="btn ghost sm" id="labClear" data-i18n="lab_clear"></button>
+          </div>
+        </div>
+        <div class="lab-side">
+          <h3 data-i18n="lab_rules"></h3>
+          <table class="tt">
+            <tr><th>a</th><th>k</th><th>a ⊕ k</th></tr>
+            <tr><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>0</td><td>1</td><td>1</td></tr>
+            <tr><td>1</td><td>0</td><td>1</td></tr>
+            <tr><td>1</td><td>1</td><td>0</td></tr>
+          </table>
+          <p data-i18n="lab_t1"></p>
+          <p data-i18n="lab_t2"></p>
+          <p data-i18n="lab_t3"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="setup" class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal"><h2 data-i18n="setup_title"></h2><p data-i18n="setup_lead"></p></div>
+      <div class="setup glass reveal">
+        <div class="field">
+          <div class="field-h">
+            <label for="pField" data-i18n="setup_plain"></label>
+            <div class="seg"><label><input type="radio" name="pmode" value="text"><span data-i18n="mode_text"></span></label><label><input type="radio" name="pmode" value="hex" checked><span data-i18n="mode_hex"></span></label></div>
+          </div>
+          <textarea id="pField" rows="2" spellcheck="false" autocomplete="off"></textarea>
+          <div id="pInfo" class="finfo"></div>
+        </div>
+        <div class="field">
+          <div class="field-h">
+            <label for="kField" data-i18n="setup_key"></label>
+            <div class="seg"><label><input type="radio" name="kmode" value="text"><span data-i18n="mode_text"></span></label><label><input type="radio" name="kmode" value="hex" checked><span data-i18n="mode_hex"></span></label></div>
+          </div>
+          <textarea id="kField" rows="2" spellcheck="false" autocomplete="off"></textarea>
+          <div id="kInfo" class="finfo"></div>
+        </div>
+        <div class="setup-btns">
+          <button type="button" class="btn primary" id="applyBtn" data-i18n="btn_apply"></button>
+          <button type="button" class="btn ghost" id="applyStay" data-i18n="btn_apply_stay"></button>
+          <button type="button" class="btn ghost" id="loadOfficial" data-i18n="btn_official_load"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="app" class="app-sec">
+    <div class="app glass" id="appBox">
+      <div class="app-top">
+        <div class="top-line">
+          <div class="rounds" id="rounds" role="group"></div>
+          <button type="button" class="btn ghost sm" id="toSetup" data-i18n="btn_setup"></button>
+        </div>
+        <div class="chips" id="chips"></div>
+        <div class="prog"><div class="bar" id="bar"></div></div>
+        <div class="prog-meta"><span id="progText"></span><span id="opText"></span></div>
+      </div>
+      <div class="app-body">
+        <div class="left">
+          <div class="grid-wrap">
+            <div class="grid-label" id="lblMain"></div>
+            <div class="grid" id="gridMain"></div>
+          </div>
+          <div class="grid-wrap aux">
+            <div class="grid-label" id="lblAux"></div>
+            <div class="grid" id="gridAux"></div>
+          </div>
+          <div class="keystrip" id="keyStrip"></div>
+          <div class="hexline" id="hexMain"></div>
+        </div>
+        <div class="right">
+          <div class="phead">
+            <span class="badge" id="badge"></span>
+            <h3 id="pTitle"></h3>
+            <p id="pLead"></p>
+          </div>
+          <div class="rows" id="rows" tabindex="0"></div>
+        </div>
+      </div>
+      <div class="app-controls">
+        <button type="button" class="btn ghost sm" id="restartBtn" data-i18n-aria="btn_restart">⟲</button>
+        <button type="button" class="btn ghost" id="prevBtn">← <span data-i18n="btn_prev"></span></button>
+        <button type="button" class="btn primary" id="nextBtn"><span data-i18n="btn_next"></span> →</button>
+        <button type="button" class="btn ghost" id="playBtn"></button>
+        <button type="button" class="btn ghost sm" id="skipBtn" data-i18n="btn_skip"></button>
+        <label class="speed"><span data-i18n="lbl_speed"></span>
+          <select id="speedSel"><option value="slow" data-i18n="sp_slow"></option><option value="normal" data-i18n="sp_normal"></option><option value="fast" data-i18n="sp_fast"></option></select>
+        </label>
+        <label class="chk" data-i18n-aria="lbl_expand"><input type="checkbox" id="expandChk"><span data-i18n="lbl_expand"></span></label>
+        <span class="kbhint" data-i18n="hint_keys"></span>
+      </div>
+    </div>
+  </section>
+
+  <section id="test" class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal"><h2 data-i18n="test_title"></h2><p data-i18n="test_lead"></p></div>
+      <div class="test glass reveal">
+        <button type="button" class="btn primary" id="testBtn" data-i18n="test_btn"></button>
+        <div id="testOut" class="test-out"></div>
+        <p class="note" data-i18n="test_note"></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p data-i18n="foot_note"></p>
+    <p class="small">GOST R 34.12-2015 · Kuznyechik</p>
+  </div>
+</footer>
+
+<script src="i18n.js"></script>
+<script src="kuznechik.js"></script>
+<script src="trace.js"></script>
+<script src="app.js"></script>
+<script src="fx.js"></script>
+<script src="../home-link.js"></script>
+</body>
+</html>

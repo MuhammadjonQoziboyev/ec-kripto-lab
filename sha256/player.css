@@ -1,0 +1,57 @@
+/* Jonli xeshlash: 1600×900 qat'iy maket. Hech narsa kattalashmaydi, siljimaydi, scroll yo'q. */
+.pstage .st-head{gap:14px}
+.pstage .st-head h3{flex:none;min-width:0}
+.pstage .msgl{display:flex;align-items:center;gap:8px;color:var(--mu);font-size:.85rem;margin-left:12px}
+.pstage .msgl input{width:320px;margin:0;padding:6px 12px;border-radius:10px;font-size:.92rem}
+.pstage .presets{display:flex;gap:6px;margin:0}
+.pstage .muted{margin:0;font:600 .8rem var(--mono);color:var(--mu2);flex:1}
+
+/* yuqoridagi umumiy sxema chizig'i */
+.map.strip{position:absolute;left:16px;right:16px;top:66px;height:98px;flex-wrap:nowrap;gap:2px;align-items:stretch}
+.strip .mn{flex:1 1 0;min-width:0;padding:7px 10px;overflow:hidden;display:flex;flex-direction:column}
+.strip .mn.wide{flex:2.1 1 0}
+.strip .mt{font-size:.85rem}
+.strip .mt i{font-size:.68rem}
+.strip .md{font-size:.7rem;margin:2px 0 3px;line-height:1.25;flex:1}
+.strip .mn.wide .md{display:none}
+.strip .msub{display:flex;flex-wrap:wrap;gap:3px;margin:3px 0;flex:1;align-content:flex-start}
+.strip .msub li{padding:1px 7px;font-size:.66rem;margin:0;border:1px solid var(--line);border-radius:99px}
+.strip .msub li.on{border-color:var(--c)}
+.strip .mbar{margin-top:auto}
+.strip .marr{font-size:.6rem}
+
+/* asosiy sahna: o'lchami hech qachon o'zgarmaydi */
+.pstage{position:absolute;left:16px;right:16px;top:174px;height:652px;padding:14px 20px;overflow:hidden;display:flex;flex-direction:column}
+.pstage .st-head{height:36px;flex:none}
+.pstage .say{height:58px;flex:none;margin:6px 0 8px!important;font-size:1rem;overflow:hidden}
+.pstage .viz{flex:1;min-height:0;overflow:hidden;padding:0;position:relative}
+
+.controls{position:absolute;left:16px;right:16px;top:838px;height:48px;margin:0;display:flex;align-items:center;gap:10px}
+.controls .keys{color:var(--mu2);font-size:.8rem;margin:0}
+.controls input[type=range]{flex:1}
+
+/* sahnadagi bo'laklar (qat'iy o'lchamlar) */
+.viz .bytes{grid-template-columns:repeat(16,1fr);max-width:none;gap:4px}
+.viz .bytes b{padding:6px 0}
+.viz .words{grid-template-columns:repeat(8,1fr);max-width:none;gap:10px}
+.viz .wgrid{grid-template-columns:repeat(8,1fr);max-width:none;margin:0;width:340px;flex:none;align-self:flex-start;gap:5px}
+.viz .wc{padding:8px 0;font-size:.72rem}
+.sch{display:flex;gap:22px;align-items:flex-start}
+.schl{flex:1;min-width:0}
+.schl>.vcols+.box{margin-top:12px}
+.vcols3{display:grid;grid-template-columns:1.18fr 1fr .98fr;gap:12px;align-items:start}
+.rr .newvals{flex-direction:column;gap:2px}
+.rr .newvals .row{flex-wrap:nowrap}
+.regwrap{overflow:visible}
+.regs,.slots{margin-left:auto;margin-right:auto}
+.regsep{margin:6px auto 12px}
+.rr .box{padding:10px 12px}
+.chartab{max-width:900px}
+.eight{gap:14px}
+.digest{font-size:1.9rem}
+.keys kbd{font-size:.75rem}
+.viz .bytes b{padding:15px 0;font-size:1.02rem}
+.viz .chartab{font-size:.95rem}
+.viz .chartab td,.viz .chartab th{padding:5px 10px}
+.viz .lgd{font-size:.95rem;margin-top:14px}
+.viz .formula{font-size:.95rem}

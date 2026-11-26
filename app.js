@@ -41,6 +41,25 @@ const MODULES = {
   }
 };
 
+// Alohida sahifali modullar (Kripto Lab'dan ko'chirilgan, o'z papkasida ishlaydi)
+const PAGES = {
+  aes: {
+    title: 'AES', href: 'aes/', full: 'Advanced Encryption Standard',
+    desc: '128-bitli blok, SubBytes, ShiftRows, MixColumns va AddRoundKey raundlari.',
+    icon: '<svg viewBox="0 0 48 48"><rect x="8" y="8" width="32" height="32" rx="2" fill="none" stroke="currentColor" stroke-width="3"/><path d="M8 19h32M8 29h32M19 8v32M29 8v32" stroke="currentColor" stroke-width="2"/><rect x="19" y="19" width="10" height="10" fill="currentColor"/></svg>'
+  },
+  sha256: {
+    title: 'SHA-256', href: 'sha256/', full: 'Secure Hash Algorithm 256',
+    desc: 'Xabarni to‘ldirish, 64 raund va 256-bitli xesh hosil bo‘lishi.',
+    icon: '<svg viewBox="0 0 48 48"><path d="M18 6l-4 36M34 6l-4 36M8 17h34M6 31h34" fill="none" stroke="currentColor" stroke-width="3"/></svg>'
+  },
+  kuznechik: {
+    title: 'Kuznechik', href: 'kuznechik/', full: 'GOST R 34.12-2015 blokli shifri',
+    desc: 'S-box, L-almashtirish va 10 raundli rus standart blokli shifri.',
+    icon: '<svg viewBox="0 0 48 48"><path d="M10 10h6v12l12-12h9L23 24l14 14h-9L16 26v12h-6z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/></svg>'
+  }
+};
+
 function route() {
   const h = location.hash.slice(1);
   document.body.className = MODULES[h] ? 'theme-' + h : 'theme-home';
@@ -57,6 +76,11 @@ function renderHome() {
     <div class="brand"><b>KRIPTO</b><span>Zamonaviy kriptografiya<br>laboratoriyasi</span></div>
     ${Object.entries(MODULES).map(([k, m]) => `
       <a class="tile tile-${k}" href="#${k}" title="${m.full}. ${m.desc}">
+        <div class="tile-ico">${m.icon}</div>
+        <h2>${m.title}</h2>
+      </a>`).join('')}
+    ${Object.entries(PAGES).map(([k, m]) => `
+      <a class="tile tile-${k}" href="${m.href}" title="${m.full}. ${m.desc}">
         <div class="tile-ico">${m.icon}</div>
         <h2>${m.title}</h2>
       </a>`).join('')}

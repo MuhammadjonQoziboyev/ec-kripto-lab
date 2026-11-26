@@ -1,0 +1,12 @@
+/* Qat'iy kanvas sahifalari (index.html, player.html): scroll yo'q */
+html,body{height:100%;overflow:hidden}
+body{margin:0;background:#070914}
+#app{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0;overflow:hidden}
+.fh{position:absolute;left:0;right:0;top:0;height:56px;display:flex;align-items:center;gap:18px;padding:0 20px;border-bottom:1px solid var(--line);background:rgba(7,9,20,.7);z-index:5}
+.fh .logo{font-weight:800;letter-spacing:.14em;text-decoration:none;font-size:1.05rem}
+.fh .ttl{color:var(--mu);font-size:.95rem}
+.fh .sp{flex:1}
+.fh a.nv{color:var(--mu);text-decoration:none;font-size:.92rem;padding:6px 14px;border-radius:99px}
+.fh a.nv:hover{color:#fff;background:rgba(255,255,255,.07)}
+.fh a.nv.act{color:#fff;background:rgba(255,255,255,.1)}
+.fh a.cta{background:linear-gradient(90deg,var(--cy),var(--vi));color:#06101a;font-weight:700;text-decoration:none;padding:7px 16px;border-radius:99px;font-size:.92rem}

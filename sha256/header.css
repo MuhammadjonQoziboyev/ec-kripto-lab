@@ -1,0 +1,9 @@
+/* Umumiy header: hamma sahifada bir xil o'lcham va joy */
+.gh{position:fixed;top:0;left:0;width:100vw;box-sizing:border-box;height:56px;z-index:100;display:flex;align-items:center;gap:6px;padding:0 24px;background:rgba(7,9,20,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.09);font:16px/1 'Inter',system-ui,-apple-system,Segoe UI,sans-serif}
+.gh-logo{font-weight:800;font-size:17px;letter-spacing:.14em;text-decoration:none}
+.gh-logo span{background:linear-gradient(90deg,#38bdf8,#a78bfa,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gh-sp{flex:1}
+.gh-a{color:#8f9ac6;text-decoration:none;font-size:15px;font-weight:500;padding:8px 16px;border-radius:99px;transition:background .2s,color .2s}
+.gh-a:hover{color:#fff;background:rgba(255,255,255,.07)}
+.gh-a.act{color:#fff;font-weight:600;background:rgba(255,255,255,.12)}
+body{padding-top:0}
